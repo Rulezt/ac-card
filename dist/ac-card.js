@@ -248,7 +248,7 @@ class AcCard extends LitElement {
               <div class="select-box" @click=${() => this._openPopup("fan")}>
                 ${svg(MDI.fan, "#a78bfa", 20)}
                 <div class="select-info">
-                  <div class="select-label">Velocità fan</div>
+                  ${cfg.show_fan_label !== false ? html`<div class="select-label">Velocità fan</div>` : ""}
                   <div class="select-value">${FAN_LABELS[fanMode] || fanMode}</div>
                 </div>
                 ${svg(MDI["chevron-down"], "#6b7280", 16)}
@@ -257,7 +257,7 @@ class AcCard extends LitElement {
               <div class="select-box" @click=${() => this._openPopup("swing")}>
                 ${svg(MDI["arrow-up-down"], "#34d399", 20)}
                 <div class="select-info">
-                  <div class="select-label">Aletta verticale</div>
+                  ${cfg.show_swing_label !== false ? html`<div class="select-label">Aletta verticale</div>` : ""}
                   <div class="select-value">${SWING_LABELS[swingMode] || swingMode}</div>
                 </div>
                 ${svg(MDI["chevron-down"], "#6b7280", 16)}
@@ -593,14 +593,22 @@ class AcCardEditor extends LitElement {
             <svg class="section-arrow" viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"/></svg>
           </div>
           <div class="section-body">
-            <div class="toggle-grid">
+            <div class="toggle-grid" style="grid-template-columns:1fr 1fr;">
               <div class="toggle-row">
                 <span>Velocità fan</span>
                 <ha-switch .checked=${cfg.show_fan !== false} @change=${e => this._set("show_fan", e.target.checked)}></ha-switch>
               </div>
               <div class="toggle-row">
+                <span>Etichetta velocità fan</span>
+                <ha-switch .checked=${cfg.show_fan_label !== false} @change=${e => this._set("show_fan_label", e.target.checked)}></ha-switch>
+              </div>
+              <div class="toggle-row">
                 <span>Aletta verticale</span>
                 <ha-switch .checked=${cfg.show_swing !== false} @change=${e => this._set("show_swing", e.target.checked)}></ha-switch>
+              </div>
+              <div class="toggle-row">
+                <span>Etichetta aletta verticale</span>
+                <ha-switch .checked=${cfg.show_swing_label !== false} @change=${e => this._set("show_swing_label", e.target.checked)}></ha-switch>
               </div>
               <div class="toggle-row">
                 <span>Temperatura</span>
