@@ -32,6 +32,17 @@ const MDI = {
   drag: "M9,3H11V5H9V3M13,3H15V5H13V3M9,7H11V9H9V7M13,7H15V9H13V7M9,11H11V13H9V11M13,11H15V13H13V11M9,15H11V17H9V15M13,15H15V17H13V15M9,19H11V21H9V19M13,19H15V21H13V19Z",
 };
 
+const MDI_CUSTOM_ICONS = {
+  fire: "M17.66 11.2C17.43 10.9 17.15 10.64 16.89 10.38C16.22 9.78 15.46 9.35 14.82 8.72C13.33 7.26 13 4.85 13.95 3C13 3.23 12.17 3.75 11.46 4.32C8.87 6.4 7.85 10.07 9.07 13.22C9.11 13.32 9.15 13.42 9.15 13.55C9.15 13.77 9 13.97 8.8 14.05C8.57 14.15 8.33 14.09 8.14 13.93C8.08 13.88 8.04 13.83 8 13.76C6.87 12.33 6.69 10.28 7.45 8.64C5.78 10 4.87 12.3 5 14.47C5.06 14.97 5.12 15.47 5.29 15.97C5.43 16.57 5.7 17.17 6 17.7C7.08 19.43 8.95 20.67 10.96 20.92C13.1 21.19 15.39 20.8 17.03 19.32C18.86 17.66 19.5 15 18.56 12.72L18.43 12.46C18.22 12 17.66 11.2 17.66 11.2M14.5 17.5C14.22 17.74 13.76 18 13.4 18.1C12.28 18.5 11.16 17.94 10.5 17.28C11.69 17 12.4 16.12 12.61 15.23C12.78 14.43 12.46 13.77 12.33 13C12.21 12.26 12.23 11.63 12.5 10.95C12.69 11.32 12.89 11.7 13.13 12C13.9 13 15.11 13.44 15.37 14.8C15.41 14.94 15.43 15.08 15.43 15.23C15.46 16.05 15.1 16.95 14.5 17.5Z",
+  snowflake: "M20,11H23V13H20V11M1,11H4V13H1V11M13,1V4H11V1H13M4.92,3.5L7.05,5.64L5.63,7.05L3.5,4.93L4.92,3.5M16.95,5.63L19.07,3.5L20.5,4.93L18.37,7.05L16.95,5.63M12,6A6,6 0 0,1 18,12A6,6 0 0,1 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6M12,8A4,4 0 0,0 8,12A4,4 0 0,0 12,16A4,4 0 0,0 16,12A4,4 0 0,0 12,8M3.5,19.07L5.63,16.95L7.05,18.37L4.93,20.5L3.5,19.07M18.37,18.37L19.07,19.07L20.5,19.07L18.37,16.95L16.95,18.37M11,20H13V23H11V20Z",
+  fan: "M12,11A1,1 0 0,0 11,12A1,1 0 0,0 12,13A1,1 0 0,0 13,12A1,1 0 0,0 12,11M12.5,2C17,2 17.11,5.57 14.75,6.75C13.68,7.29 13.9,8.42 14.58,8.99C15.86,10.08 17.35,9 17.35,9C19.64,7.57 22.22,9.63 21.19,12C20.69,13.17 19.32,13.19 18.53,12.63C17.55,11.95 16.56,12.71 16.45,13.6C16.2,15.5 17.5,16 17.5,16C20.21,16.94 19.63,20.5 17,20.5C15.8,20.5 15.31,19.55 15.44,18.63C15.59,17.55 14.74,16.82 13.85,16.94C11.96,17.2 12,18.5 12,18.5C12,21.21 8.44,21.76 7.5,19.13C7.06,17.93 7.93,17 8.85,16.94C9.93,16.87 10.55,16 10.39,15.09C10.1,13.2 8.5,13.5 8.5,13.5C5.71,14.26 4.08,11.15 6,9.41C6.93,8.57 8.08,9 8.77,9.79C9.52,10.66 10.66,10.34 11.05,9.46C11.82,7.65 10.5,7 10.5,7C7.89,5.87 8.43,2.28 11.06,2.04L12.5,2Z",
+  water: "M12,20A6,6 0 0,1 6,14C6,10 12,3.25 12,3.25C12,3.25 18,10 18,14A6,6 0 0,1 12,20Z",
+  power: "M16.56,5.44L15.11,6.89C16.84,7.94 18,9.83 18,12A6,6 0 0,1 12,18A6,6 0 0,1 6,12C6,9.83 7.16,7.94 8.88,6.88L7.44,5.44C5.36,6.88 4,9.28 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12C20,9.28 18.64,6.88 16.56,5.44M13,4H11V13H13",
+  autorenew: "M12,6V9L16,5L12,1V4A8,8 0 0,0 4,12C4,13.57 4.46,15.03 5.24,16.26L6.7,14.8C6.25,13.97 6,13 6,12A6,6 0 0,1 12,6M18.76,7.74L17.3,9.2C17.74,10.04 18,11 18,12A6,6 0 0,1 12,18V15L8,19L12,23V20A8,8 0 0,0 20,12C20,10.43 19.54,8.97 18.76,7.74Z",
+  "weather-sunny": "M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,2L14.39,5.42C13.65,5.15 12.84,5 12,5C11.16,5 10.35,5.15 9.61,5.42L12,2M3.34,7L7.5,6.65C6.9,7.16 6.36,7.78 5.94,8.5C5.5,9.24 5.25,10 5.11,10.79L3.34,7M3.36,17L5.12,13.23C5.26,14 5.53,14.78 5.95,15.5C6.37,16.24 6.91,16.86 7.5,17.37L3.36,17M20.65,7L18.88,10.79C18.74,10 18.47,9.23 18.05,8.5C17.63,7.78 17.1,7.15 16.5,6.64L20.65,7M20.64,17L16.5,17.36C17.09,16.85 17.62,16.22 18.04,15.5C18.46,14.77 18.73,14 18.87,13.21L20.64,17M12,22L9.59,18.56C10.33,18.83 11.14,19 12,19C12.82,19 13.63,18.83 14.37,18.56L12,22Z",
+  "air-filter": "M4,2H20A2,2 0 0,1 22,4V6C22,6 20,8 20,10C20,12 22,14 22,14V20A2,2 0 0,1 20,22H4A2,2 0 0,1 2,20V14C2,14 4,12 4,10C4,8 2,6 2,6V4A2,2 0 0,1 4,2M12,10A2,2 0 0,0 10,12A2,2 0 0,0 12,14A2,2 0 0,0 14,12A2,2 0 0,0 12,10Z",
+};
+
 const FAN_LABELS = {
   auto: "Auto", low: "Bassa", medium: "Media", high: "Alta", quiet: "Silenziosa",
   "Auto": "Auto", "Level 1": "Velocità 1", "Level 2": "Velocità 2",
@@ -180,7 +191,8 @@ class AcCard extends LitElement {
       : availableModes;
     const visibleModes = orderedModes.filter(m => !hiddenModes.includes(m));
 
-    const activeColor = MODE_COLORS[hvacMode] || "#60a5fa";
+    const modeCustomCfg = cfg.mode_custom || {};
+    const activeColor = (modeCustomCfg[hvacMode]?.color) || MODE_COLORS[hvacMode] || "#60a5fa";
     const isFanPopup = this._popupType === "fan";
     const popupOptions = isFanPopup ? fanModes : swingModes;
     const popupLabels = isFanPopup ? FAN_LABELS : SWING_LABELS;
@@ -195,7 +207,7 @@ class AcCard extends LitElement {
       <div class="card">
         <div class="header">
           <div class="header-left">
-            ${svg(MODE_ICONS[hvacMode] || MODE_ICONS.off, activeColor, 20)}
+            ${svg((modeCustomCfg[hvacMode]?.icon && MDI_CUSTOM_ICONS[modeCustomCfg[hvacMode].icon]) || MODE_ICONS[hvacMode] || MODE_ICONS.off, activeColor, 20)}
             ${cardName}
           </div>
           <div class="header-right">
@@ -218,12 +230,14 @@ class AcCard extends LitElement {
         <div class="modes">
           ${visibleModes.map(m => {
             const active = hvacMode === m;
-            const color = MODE_COLORS[m] || "#6b7280";
+            const custom = modeCustomCfg[m] || {};
+            const color = custom.color || MODE_COLORS[m] || "#6b7280";
+            const iconPath = (custom.icon && MDI_CUSTOM_ICONS[custom.icon]) || MODE_ICONS[m] || MODE_ICONS.off;
             return html`
               <button class="mode-btn" title="${MODE_LABELS[m] || m}"
                 style="${active ? `background:${color}22;border-color:${color};` : "border-color:#3f3f3f;"}"
                 @click=${() => this._setMode(m)}>
-                ${svg(MODE_ICONS[m] || MODE_ICONS.off, active ? color : "#6b7280", 22)}
+                ${svg(iconPath, active ? color : "#6b7280", 22)}
               </button>`;
           })}
         </div>
@@ -317,6 +331,12 @@ class AcCardEditor extends LitElement {
   }
 
   _onDragEnd() { this._dragIndex = null; }
+
+  _setModeCustom(mode, key, value) {
+    const modeCustom = { ...(this._config.mode_custom || {}) };
+    modeCustom[mode] = { ...(modeCustom[mode] || {}), [key]: value };
+    this._set("mode_custom", modeCustom);
+  }
 
   _toggleSection(e) {
     const header = e.currentTarget;
@@ -605,7 +625,12 @@ class AcCardEditor extends LitElement {
           <div class="section-body">
             <div style="font-size:12px;color:var(--secondary-text-color);margin-bottom:10px;">Trascina per riordinare • Occhio per nascondere</div>
             <div class="modes-list">
-              ${modesOrder.map((m, i) => html`
+              ${modesOrder.map((m, i) => {
+                const modeCustom = (cfg.mode_custom || {})[m] || {};
+                const modeColor = modeCustom.color || MODE_COLORS[m] || "#6b7280";
+                const modeIcon = modeCustom.icon || m;
+                const modeIconPath = MDI_CUSTOM_ICONS[modeIcon] || MODE_ICONS[m] || MODE_ICONS.off;
+                return html`
                 <div class="mode-item ${this._dragIndex === i ? "dragging" : ""} ${hidden.includes(m) ? "hidden-mode" : ""}"
                   draggable="true"
                   @dragstart=${e => this._onDragStart(e, i)}
@@ -618,11 +643,20 @@ class AcCardEditor extends LitElement {
                         : 'M12,9A3,3 0 0,1 15,12A3,3 0 0,1 12,15A3,3 0 0,1 9,12A3,3 0 0,1 12,9M12,4.5C17,4.5 21.27,7.61 23,12C21.27,16.39 17,19.5 12,19.5C7,19.5 2.73,16.39 1,12C2.73,7.61 7,4.5 12,4.5M3.18,12C4.83,15.36 8.24,17.5 12,17.5C15.76,17.5 19.17,15.36 20.82,12C19.17,8.64 15.76,6.5 12,6.5C8.24,6.5 4.83,8.64 3.18,12Z'}"/>
                     </svg>
                   </button>
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="${modeColor}" style="flex-shrink:0"><path d="${modeIconPath}"/></svg>
                   <span class="mode-name">${MODE_LABELS[m] || m}</span>
+                  <input type="color" value="${modeColor}" title="Colore"
+                    style="width:28px;height:28px;border:none;border-radius:4px;cursor:pointer;padding:0;background:none;flex-shrink:0;"
+                    @change=${e => this._setModeCustom(m, "color", e.target.value)}>
+                  <select style="background:var(--card-background-color);color:var(--primary-text-color);border:1px solid var(--divider-color);border-radius:4px;padding:3px;font-size:11px;max-width:90px;"
+                    @change=${e => this._setModeCustom(m, "icon", e.target.value)}>
+                    ${Object.keys(MDI_CUSTOM_ICONS).map(k => html`<option value="${k}" ?selected=${modeIcon === k}>${k}</option>`)}
+                  </select>
                   <span class="drag-handle">
                     <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="${MDI.drag}"/></svg>
                   </span>
-                </div>`)}
+                </div>`;
+              })}
             </div>
           </div>
         </div>` : ""}
