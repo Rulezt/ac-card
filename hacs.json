@@ -1,0 +1,7 @@
+{
+  "name": "AC Card",
+  "description": "Custom Lovelace card for Home Assistant to control air conditioners via IR",
+  "render_readme": true,
+  "domains": ["climate"],
+  "homeassistant": "2023.0.0"
+}
