@@ -318,6 +318,14 @@ class AcCardEditor extends LitElement {
 
   _onDragEnd() { this._dragIndex = null; }
 
+  _toggleSection(e) {
+    const header = e.currentTarget;
+    const body = header.nextElementSibling;
+    const arrow = header.querySelector(".section-arrow");
+    body.classList.toggle("open");
+    arrow.classList.toggle("open");
+  }
+
   render() {
     if (!this.hass) return html``;
     const cfg = this._config || {};
@@ -447,6 +455,178 @@ class AcCardEditor extends LitElement {
                 </span>
               </div>`)}
           </div>` : ""}
+      </div>
+    `;
+  }  render() {
+    if (!this.hass) return html``;
+    const cfg = this._config || {};
+    const hidden = cfg.hidden_modes || [];
+    const climate = cfg.climate_entity ? this.hass.states[cfg.climate_entity] : null;
+    const availableModes = climate?.attributes?.hvac_modes || [];
+    const modesOrder = cfg.modes_order?.length > 0
+      ? [...cfg.modes_order.filter(m => availableModes.includes(m)), ...availableModes.filter(m => !cfg.modes_order.includes(m))]
+      : availableModes;
+
+    return html`
+      <style>
+        .editor { font-family: sans-serif; }
+        .section { border: 1px solid var(--divider-color); border-radius: 8px; margin-bottom: 8px; overflow: hidden; }
+        .section-header { display: flex; align-items: center; gap: 12px; padding: 14px 16px; cursor: pointer; background: var(--secondary-background-color); user-select: none; }
+        .section-header svg { flex-shrink: 0; }
+        .section-title { flex: 1; font-size: 13px; font-weight: 500; color: var(--primary-text-color); }
+        .section-arrow { transition: transform 0.2s; color: var(--secondary-text-color); }
+        .section-arrow.open { transform: rotate(180deg); }
+        .section-body { padding: 12px 16px; display: none; }
+        .section-body.open { display: block; }
+        .row { margin-bottom: 14px; }
+        .row:last-child { margin-bottom: 0; }
+        label.row-label { display: block; font-size: 12px; color: var(--secondary-text-color); margin-bottom: 4px; }
+        input[type=text], input[type=number] { width: 100%; padding: 8px; border: 1px solid var(--divider-color); border-radius: 6px; font-size: 14px; box-sizing: border-box; background: var(--card-background-color); color: var(--primary-text-color); }
+        .temp-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .temp-row label { display: block; font-size: 12px; color: var(--secondary-text-color); margin-bottom: 4px; }
+        .toggle-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; border-radius: 6px; background: var(--card-background-color); border: 1px solid var(--divider-color); font-size: 13px; }
+        .modes-list { display: flex; flex-direction: column; gap: 6px; }
+        .mode-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px; background: var(--card-background-color); border: 1px solid var(--divider-color); font-size: 13px; cursor: grab; user-select: none; }
+        .mode-item.dragging { opacity: 0.4; }
+        .mode-item.hidden-mode { opacity: 0.4; }
+        .drag-handle { color: var(--secondary-text-color); cursor: grab; display: flex; }
+        .mode-name { flex: 1; }
+        .eye-btn { background: none; border: none; cursor: pointer; padding: 2px; display: flex; align-items: center; color: var(--secondary-text-color); }
+        .eye-btn:hover { color: var(--primary-text-color); }
+      </style>
+      <div class="editor">
+
+        <!-- GENERALE -->
+        <div class="section">
+          <div class="section-header" @click=${e => this._toggleSection(e)}>
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="var(--primary-text-color)"><path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12,6A6,6 0 0,0 6,12A6,6 0 0,0 12,18A6,6 0 0,0 18,12A6,6 0 0,0 12,6M12,8A4,4 0 0,1 16,12A4,4 0 0,1 12,16A4,4 0 0,1 8,12A4,4 0 0,1 12,8Z"/></svg>
+            <span class="section-title">Generale</span>
+            <svg class="section-arrow open" viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"/></svg>
+          </div>
+          <div class="section-body open">
+            <div class="row">
+              <label class="row-label">Nome card</label>
+              <input type="text" .value=${cfg.name || "Climatizzatore"} @change=${e => this._set("name", e.target.value)}>
+            </div>
+            <div class="row">
+              <label class="row-label">Entità climate *</label>
+              <ha-entity-picker .hass=${this.hass} .value=${cfg.climate_entity || ""} .includeDomains=${["climate"]}
+                allow-custom-entity @value-changed=${e => this._set("climate_entity", e.detail.value)}></ha-entity-picker>
+            </div>
+            <div class="temp-row">
+              <div><label>Temperatura minima</label>
+                <input type="number" .value=${cfg.min_temp || 16} @change=${e => this._set("min_temp", parseInt(e.target.value))}></div>
+              <div><label>Temperatura massima</label>
+                <input type="number" .value=${cfg.max_temp || 30} @change=${e => this._set("max_temp", parseInt(e.target.value))}></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SENSORI -->
+        <div class="section">
+          <div class="section-header" @click=${e => this._toggleSection(e)}>
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="var(--primary-text-color)"><path d="M15,13V5A3,3 0 0,0 9,5V13A5,5 0 1,0 15,13M12,4A1,1 0 0,1 13,5V8H11V5A1,1 0 0,1 12,4Z"/></svg>
+            <span class="section-title">Sensori</span>
+            <svg class="section-arrow" viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"/></svg>
+          </div>
+          <div class="section-body">
+            <div class="row">
+              <label class="row-label">Sensore temperatura</label>
+              <ha-entity-picker .hass=${this.hass} .value=${cfg.temperature_entity || ""} .includeDomains=${["sensor"]}
+                allow-custom-entity @value-changed=${e => this._set("temperature_entity", e.detail.value)}></ha-entity-picker>
+            </div>
+            <div class="row">
+              <label class="row-label">Sensore umidità</label>
+              <ha-entity-picker .hass=${this.hass} .value=${cfg.humidity_entity || ""} .includeDomains=${["sensor"]}
+                allow-custom-entity @value-changed=${e => this._set("humidity_entity", e.detail.value)}></ha-entity-picker>
+            </div>
+          </div>
+        </div>
+
+        <!-- ENTITÀ SELECT -->
+        <div class="section">
+          <div class="section-header" @click=${e => this._toggleSection(e)}>
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="var(--primary-text-color)"><path d="M12,11A1,1 0 0,0 11,12A1,1 0 0,0 12,13A1,1 0 0,0 13,12A1,1 0 0,0 12,11M12.5,2C17,2 17.11,5.57 14.75,6.75C13.68,7.29 13.9,8.42 14.58,8.99C15.86,10.08 17.35,9 17.35,9C19.64,7.57 22.22,9.63 21.19,12C20.69,13.17 19.32,13.19 18.53,12.63C17.55,11.95 16.56,12.71 16.45,13.6C16.2,15.5 17.5,16 17.5,16C20.21,16.94 19.63,20.5 17,20.5C15.8,20.5 15.31,19.55 15.44,18.63C15.59,17.55 14.74,16.82 13.85,16.94C11.96,17.2 12,18.5 12,18.5C12,21.21 8.44,21.76 7.5,19.13C7.06,17.93 7.93,17 8.85,16.94C9.93,16.87 10.55,16 10.39,15.09C10.1,13.2 8.5,13.5 8.5,13.5C5.71,14.26 4.08,11.15 6,9.41C6.93,8.57 8.08,9 8.77,9.79C9.52,10.66 10.66,10.34 11.05,9.46C11.82,7.65 10.5,7 10.5,7C7.89,5.87 8.43,2.28 11.06,2.04L12.5,2Z"/></svg>
+            <span class="section-title">Entità select</span>
+            <svg class="section-arrow" viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"/></svg>
+          </div>
+          <div class="section-body">
+            <div class="row">
+              <label class="row-label">Velocità fan (select esterno)</label>
+              <ha-entity-picker .hass=${this.hass} .value=${cfg.fan_entity || ""} .includeDomains=${["select"]}
+                allow-custom-entity @value-changed=${e => this._set("fan_entity", e.detail.value)}></ha-entity-picker>
+            </div>
+            <div class="row">
+              <label class="row-label">Swing verticale (select esterno)</label>
+              <ha-entity-picker .hass=${this.hass} .value=${cfg.swing_entity || ""} .includeDomains=${["select"]}
+                allow-custom-entity @value-changed=${e => this._set("swing_entity", e.detail.value)}></ha-entity-picker>
+            </div>
+          </div>
+        </div>
+
+        <!-- VISIBILITÀ -->
+        <div class="section">
+          <div class="section-header" @click=${e => this._toggleSection(e)}>
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="var(--primary-text-color)"><path d="M12,9A3,3 0 0,1 15,12A3,3 0 0,1 12,15A3,3 0 0,1 9,12A3,3 0 0,1 12,9M12,4.5C17,4.5 21.27,7.61 23,12C21.27,16.39 17,19.5 12,19.5C7,19.5 2.73,16.39 1,12C2.73,7.61 7,4.5 12,4.5M3.18,12C4.83,15.36 8.24,17.5 12,17.5C15.76,17.5 19.17,15.36 20.82,12C19.17,8.64 15.76,6.5 12,6.5C8.24,6.5 4.83,8.64 3.18,12Z"/></svg>
+            <span class="section-title">Visibilità controlli</span>
+            <svg class="section-arrow" viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"/></svg>
+          </div>
+          <div class="section-body">
+            <div class="toggle-grid">
+              <div class="toggle-row">
+                <span>Velocità fan</span>
+                <ha-switch .checked=${cfg.show_fan !== false} @change=${e => this._set("show_fan", e.target.checked)}></ha-switch>
+              </div>
+              <div class="toggle-row">
+                <span>Aletta verticale</span>
+                <ha-switch .checked=${cfg.show_swing !== false} @change=${e => this._set("show_swing", e.target.checked)}></ha-switch>
+              </div>
+              <div class="toggle-row">
+                <span>Temperatura</span>
+                <ha-switch .checked=${cfg.show_temperature !== false} @change=${e => this._set("show_temperature", e.target.checked)}></ha-switch>
+              </div>
+              <div class="toggle-row">
+                <span>Umidità</span>
+                <ha-switch .checked=${cfg.show_humidity !== false} @change=${e => this._set("show_humidity", e.target.checked)}></ha-switch>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MODALITÀ -->
+        ${modesOrder.length > 0 ? html`
+        <div class="section">
+          <div class="section-header" @click=${e => this._toggleSection(e)}>
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="var(--primary-text-color)"><path d="M12,15.39L8.24,17.66L9.23,13.38L5.91,10.5L10.29,10.13L12,6.09L13.71,10.13L18.09,10.5L14.77,13.38L15.76,17.66M22,9.24L14.81,8.63L12,2L9.19,8.63L2,9.24L7.45,13.97L5.82,21L12,17.27L18.18,21L16.54,13.97L22,9.24Z"/></svg>
+            <span class="section-title">Ordine modalità</span>
+            <svg class="section-arrow" viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"/></svg>
+          </div>
+          <div class="section-body">
+            <div style="font-size:12px;color:var(--secondary-text-color);margin-bottom:10px;">Trascina per riordinare • Occhio per nascondere</div>
+            <div class="modes-list">
+              ${modesOrder.map((m, i) => html`
+                <div class="mode-item ${this._dragIndex === i ? "dragging" : ""} ${hidden.includes(m) ? "hidden-mode" : ""}"
+                  draggable="true"
+                  @dragstart=${e => this._onDragStart(e, i)}
+                  @dragover=${e => this._onDragOver(e, i)}
+                  @dragend=${this._onDragEnd}>
+                  <button class="eye-btn" title="${hidden.includes(m) ? "Mostra" : "Nascondi"}" @click=${() => this._toggleMode(m)}>
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                      <path d="${hidden.includes(m)
+                        ? 'M11.83,9L15,12.16C15,12.11 15,12.05 15,12A3,3 0 0,0 12,9C11.94,9 11.89,9 11.83,9M7.53,9.8L9.08,11.35C9.03,11.56 9,11.77 9,12A3,3 0 0,0 12,15C12.22,15 12.44,14.97 12.65,14.92L14.2,16.47C13.53,16.8 12.79,17 12,17A5,5 0 0,1 7,12C7,11.21 7.2,10.47 7.53,9.8M2,4.27L4.28,6.55L4.73,7C3.08,8.3 1.78,10 1,12C2.73,16.39 7,19.5 12,19.5C13.55,19.5 15.03,19.2 16.38,18.66L16.81,19.08L19.73,22L21,20.73L3.27,3M12,7A5,5 0 0,1 17,12C17,12.64 16.87,13.26 16.64,13.82L19.57,16.75C21.07,15.5 22.27,13.86 23,12C21.27,7.61 17,4.5 12,4.5C10.6,4.5 9.26,4.75 8,5.2L10.17,7.35C10.74,7.13 11.35,7 12,7Z'
+                        : 'M12,9A3,3 0 0,1 15,12A3,3 0 0,1 12,15A3,3 0 0,1 9,12A3,3 0 0,1 12,9M12,4.5C17,4.5 21.27,7.61 23,12C21.27,16.39 17,19.5 12,19.5C7,19.5 2.73,16.39 1,12C2.73,7.61 7,4.5 12,4.5M3.18,12C4.83,15.36 8.24,17.5 12,17.5C15.76,17.5 19.17,15.36 20.82,12C19.17,8.64 15.76,6.5 12,6.5C8.24,6.5 4.83,8.64 3.18,12Z'}"/>
+                    </svg>
+                  </button>
+                  <span class="mode-name">${MODE_LABELS[m] || m}</span>
+                  <span class="drag-handle">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="${MDI.drag}"/></svg>
+                  </span>
+                </div>`)}
+            </div>
+          </div>
+        </div>` : ""}
+
       </div>
     `;
   }
