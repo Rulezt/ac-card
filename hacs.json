@@ -4,4 +4,5 @@
   "render_readme": true,
   "domains": ["climate"],
   "homeassistant": "2023.0.0"
+  "version": "1.1.0"
 }
