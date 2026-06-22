@@ -93,10 +93,10 @@ class AcCard extends LitElement {
       .select-info { flex: 1; min-width: 0; }
       .select-label { font-size: 11px; color: #9ca3af; margin-bottom: 3px; }
       .select-value { font-size: 13px; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-      .popup-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 9999; align-items: flex-end; justify-content: center; }
+      .popup-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 9999; align-items: center; justify-content: center; }
       .popup-overlay.open { display: flex; }
-      .popup-sheet { background: #2c2c2e; border-radius: 16px 16px 0 0; width: 100%; max-width: 500px; padding: 16px; max-height: 70vh; overflow-y: auto; }
-      .popup-handle { width: 36px; height: 4px; background: #4b5563; border-radius: 2px; margin: 0 auto 16px; }
+      .popup-sheet { background: #2c2c2e; border-radius: 16px; width: 90%; max-width: 400px; padding: 16px; max-height: 70vh; overflow-y: auto; }
+      .popup-handle { display: none; }
       .popup-title { font-size: 14px; font-weight: 500; color: #9ca3af; margin-bottom: 12px; text-align: center; }
       .popup-item { display: flex; align-items: center; width: 100%; background: #3a3a3c; border: none; color: white; padding: 14px 16px; margin-bottom: 8px; border-radius: 10px; font-size: 15px; text-align: left; cursor: pointer; box-sizing: border-box; }
       .popup-item:active { opacity: 0.6; }
@@ -127,6 +127,7 @@ class AcCard extends LitElement {
 
   get _climate() { return this.hass?.states[this._config?.climate_entity]; }
   get _tempSensor() { return this._config?.temperature_entity ? this.hass?.states[this._config.temperature_entity] : null; }
+  get _powerSensor() { return this._config?.power_entity ? this.hass?.states[this._config.power_entity] : null; }
   get _humSensor() { return this._config?.humidity_entity ? this.hass?.states[this._config.humidity_entity] : null; }
   get _fanEntity() { return this._config?.fan_entity ? this.hass?.states[this._config.fan_entity] : null; }
   get _swingEntity() { return this._config?.swing_entity ? this.hass?.states[this._config.swing_entity] : null; }
@@ -171,6 +172,7 @@ class AcCard extends LitElement {
     const climate = this._climate;
     const tempSensor = this._tempSensor;
     const humSensor = this._humSensor;
+    const powerSensor = this._powerSensor;
     const fanEntity = this._fanEntity;
     const swingEntity = this._swingEntity;
 
@@ -218,6 +220,12 @@ class AcCard extends LitElement {
           </div>
         </div>
 
+        ${powerSensor ? html`
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px;padding:8px 10px;background:#2c2c2e;border-radius:10px;font-size:13px;color:#9ca3af;">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="#fbbf24"><path d="M11.5,1L2,6V12C2,17.55 6.08,22.74 12,24C17.92,22.74 22,17.55 22,12V6L11.5,1M11.5,3.18L20,7.3V12C20,16.54 16.6,20.89 11.5,22.03C6.4,20.89 4,16.54 4,12V7.3L11.5,3.18M13,16H11V18H13V16M13,6H11V14H13V6"/></svg>
+          <span>Consumo</span>
+          <span style="color:white;font-weight:500;margin-left:auto;">${parseFloat(powerSensor.state).toFixed(0)} W</span>
+        </div>` : ""}
         <div class="temp-section">
           <div class="mode-label">${MODE_LABELS[hvacMode] || hvacMode}</div>
           <div class="temp-controls">
@@ -403,6 +411,11 @@ class AcCardEditor extends LitElement {
               <label class="row-label">Sensore umidità</label>
               <ha-entity-picker .hass=${this.hass} .value=${cfg.humidity_entity || ""} .includeDomains=${["sensor"]}
                 allow-custom-entity @value-changed=${e => this._set("humidity_entity", e.detail.value)}></ha-entity-picker>
+            </div>
+            <div class="row">
+              <label class="row-label">Sensore consumo (W)</label>
+              <ha-entity-picker .hass=${this.hass} .value=${cfg.power_entity || ""} .includeDomains=${["sensor"]}
+                allow-custom-entity @value-changed=${e => this._set("power_entity", e.detail.value)}></ha-entity-picker>
             </div>
           </div>
         </details>
