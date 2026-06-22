@@ -360,29 +360,43 @@ class AcCardEditor extends LitElement {
             allow-custom-entity @value-changed=${e => this._set("climate_entity", e.detail.value)}></ha-entity-picker>
         </div>
 
-        <h4>Sensori (opzionali)</h4>
-        <div class="row">
-          <label class="row-label">Sensore temperatura</label>
-          <ha-entity-picker .hass=${this.hass} .value=${cfg.temperature_entity || ""} .includeDomains=${["sensor"]}
-            allow-custom-entity @value-changed=${e => this._set("temperature_entity", e.detail.value)}></ha-entity-picker>
-        </div>
-        <div class="row">
-          <label class="row-label">Sensore umidità</label>
-          <ha-entity-picker .hass=${this.hass} .value=${cfg.humidity_entity || ""} .includeDomains=${["sensor"]}
-            allow-custom-entity @value-changed=${e => this._set("humidity_entity", e.detail.value)}></ha-entity-picker>
-        </div>
+        <details>
+          <summary style="cursor:pointer;font-size:12px;color:var(--secondary-text-color);text-transform:uppercase;letter-spacing:0.5px;padding:8px 0;list-style:none;display:flex;align-items:center;gap:6px;">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"/></svg>
+            Sensori (opzionali)
+          </summary>
+          <div style="margin-top:8px;">
+            <div class="row">
+              <label class="row-label">Sensore temperatura</label>
+              <ha-entity-picker .hass=${this.hass} .value=${cfg.temperature_entity || ""} .includeDomains=${["sensor"]}
+                allow-custom-entity @value-changed=${e => this._set("temperature_entity", e.detail.value)}></ha-entity-picker>
+            </div>
+            <div class="row">
+              <label class="row-label">Sensore umidità</label>
+              <ha-entity-picker .hass=${this.hass} .value=${cfg.humidity_entity || ""} .includeDomains=${["sensor"]}
+                allow-custom-entity @value-changed=${e => this._set("humidity_entity", e.detail.value)}></ha-entity-picker>
+            </div>
+          </div>
+        </details>
 
-        <h4>Entità select (opzionali)</h4>
-        <div class="row">
-          <label class="row-label">Velocità fan (select esterno)</label>
-          <ha-entity-picker .hass=${this.hass} .value=${cfg.fan_entity || ""} .includeDomains=${["select"]}
-            allow-custom-entity @value-changed=${e => this._set("fan_entity", e.detail.value)}></ha-entity-picker>
-        </div>
-        <div class="row">
-          <label class="row-label">Swing verticale (select esterno)</label>
-          <ha-entity-picker .hass=${this.hass} .value=${cfg.swing_entity || ""} .includeDomains=${["select"]}
-            allow-custom-entity @value-changed=${e => this._set("swing_entity", e.detail.value)}></ha-entity-picker>
-        </div>
+        <details>
+          <summary style="cursor:pointer;font-size:12px;color:var(--secondary-text-color);text-transform:uppercase;letter-spacing:0.5px;padding:8px 0;list-style:none;display:flex;align-items:center;gap:6px;">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"/></svg>
+            Entità select (opzionali)
+          </summary>
+          <div style="margin-top:8px;">
+            <div class="row">
+              <label class="row-label">Velocità fan (select esterno)</label>
+              <ha-entity-picker .hass=${this.hass} .value=${cfg.fan_entity || ""} .includeDomains=${["select"]}
+                allow-custom-entity @value-changed=${e => this._set("fan_entity", e.detail.value)}></ha-entity-picker>
+            </div>
+            <div class="row">
+              <label class="row-label">Swing verticale (select esterno)</label>
+              <ha-entity-picker .hass=${this.hass} .value=${cfg.swing_entity || ""} .includeDomains=${["select"]}
+                allow-custom-entity @value-changed=${e => this._set("swing_entity", e.detail.value)}></ha-entity-picker>
+            </div>
+          </div>
+        </details>
 
         <div class="temp-row">
           <div><label>Temperatura minima</label>
@@ -392,21 +406,23 @@ class AcCardEditor extends LitElement {
         </div>
 
         <h4>Visibilità controlli</h4>
-        <div class="toggle-row">
-          <span>Mostra velocità fan</span>
-          <ha-switch .checked=${cfg.show_fan !== false} @change=${e => this._set("show_fan", e.target.checked)}></ha-switch>
-        </div>
-        <div class="toggle-row">
-          <span>Mostra aletta verticale</span>
-          <ha-switch .checked=${cfg.show_swing !== false} @change=${e => this._set("show_swing", e.target.checked)}></ha-switch>
-        </div>
-        <div class="toggle-row">
-          <span>Mostra temperatura</span>
-          <ha-switch .checked=${cfg.show_temperature !== false} @change=${e => this._set("show_temperature", e.target.checked)}></ha-switch>
-        </div>
-        <div class="toggle-row">
-          <span>Mostra umidità</span>
-          <ha-switch .checked=${cfg.show_humidity !== false} @change=${e => this._set("show_humidity", e.target.checked)}></ha-switch>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <div class="toggle-row">
+            <span>Velocità fan</span>
+            <ha-switch .checked=${cfg.show_fan !== false} @change=${e => this._set("show_fan", e.target.checked)}></ha-switch>
+          </div>
+          <div class="toggle-row">
+            <span>Aletta verticale</span>
+            <ha-switch .checked=${cfg.show_swing !== false} @change=${e => this._set("show_swing", e.target.checked)}></ha-switch>
+          </div>
+          <div class="toggle-row">
+            <span>Temperatura</span>
+            <ha-switch .checked=${cfg.show_temperature !== false} @change=${e => this._set("show_temperature", e.target.checked)}></ha-switch>
+          </div>
+          <div class="toggle-row">
+            <span>Umidità</span>
+            <ha-switch .checked=${cfg.show_humidity !== false} @change=${e => this._set("show_humidity", e.target.checked)}></ha-switch>
+          </div>
         </div>
 
         ${modesOrder.length > 0 ? html`
@@ -418,17 +434,17 @@ class AcCardEditor extends LitElement {
                 @dragstart=${e => this._onDragStart(e, i)}
                 @dragover=${e => this._onDragOver(e, i)}
                 @dragend=${this._onDragEnd}>
+                <button class="eye-btn" title="${hidden.includes(m) ? 'Mostra' : 'Nascondi'}" @click=${() => this._toggleMode(m)}>
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                    <path d="${hidden.includes(m)
+                      ? 'M11.83,9L15,12.16C15,12.11 15,12.05 15,12A3,3 0 0,0 12,9C11.94,9 11.89,9 11.83,9M7.53,9.8L9.08,11.35C9.03,11.56 9,11.77 9,12A3,3 0 0,0 12,15C12.22,15 12.44,14.97 12.65,14.92L14.2,16.47C13.53,16.8 12.79,17 12,17A5,5 0 0,1 7,12C7,11.21 7.2,10.47 7.53,9.8M2,4.27L4.28,6.55L4.73,7C3.08,8.3 1.78,10 1,12C2.73,16.39 7,19.5 12,19.5C13.55,19.5 15.03,19.2 16.38,18.66L16.81,19.08L19.73,22L21,20.73L3.27,3M12,7A5,5 0 0,1 17,12C17,12.64 16.87,13.26 16.64,13.82L19.57,16.75C21.07,15.5 22.27,13.86 23,12C21.27,7.61 17,4.5 12,4.5C10.6,4.5 9.26,4.75 8,5.2L10.17,7.35C10.74,7.13 11.35,7 12,7Z'
+                      : 'M12,9A3,3 0 0,1 15,12A3,3 0 0,1 12,15A3,3 0 0,1 9,12A3,3 0 0,1 12,9M12,4.5C17,4.5 21.27,7.61 23,12C21.27,16.39 17,19.5 12,19.5C7,19.5 2.73,16.39 1,12C2.73,7.61 7,4.5 12,4.5M3.18,12C4.83,15.36 8.24,17.5 12,17.5C15.76,17.5 19.17,15.36 20.82,12C19.17,8.64 15.76,6.5 12,6.5C8.24,6.5 4.83,8.64 3.18,12Z'}"/>
+                  </svg>
+                </button>
+                <span class="mode-name">${MODE_LABELS[m] || m}</span>
                 <span class="drag-handle">
                   <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="${MDI.drag}"/></svg>
                 </span>
-                <span class="mode-name">${MODE_LABELS[m] || m}</span>
-                <button class="eye-btn" @click=${() => this._toggleMode(m)} title="${hidden.includes(m) ? "Mostra" : "Nascondi"}">
-                  <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
-                    ${hidden.includes(m)
-                      ? html`<path d="M11.83,9L15,12.16C15,12.11 15,12.05 15,12A3,3 0 0,0 12,9C11.94,9 11.89,9 11.83,9M7.53,9.8L9.08,11.35C9.03,11.56 9,11.77 9,12A3,3 0 0,0 12,15C12.22,15 12.44,14.97 12.65,14.92L14.2,16.47C13.53,16.8 12.79,17 12,17A5,5 0 0,1 7,12C7,11.21 7.2,10.47 7.53,9.8M2,4.27L4.28,6.55L4.73,7C3.08,8.3 1.78,10 1,12C2.73,16.39 7,19.5 12,19.5C13.55,19.5 15.03,19.2 16.38,18.66L16.81,19.08L19.73,22L21,20.73L3.27,3M12,7A5,5 0 0,1 17,12C17,12.64 16.87,13.26 16.64,13.82L19.57,16.75C21.07,15.5 22.27,13.86 23,12C21.27,7.61 17,4.5 12,4.5C10.6,4.5 9.26,4.75 8,5.2L10.17,7.35C10.74,7.13 11.35,7 12,7Z"/>`
-                      : html`<path d="M12,9A3,3 0 0,1 15,12A3,3 0 0,1 12,15A3,3 0 0,1 9,12A3,3 0 0,1 12,9M12,4.5C17,4.5 21.27,7.61 23,12C21.27,16.39 17,19.5 12,19.5C7,19.5 2.73,16.39 1,12C2.73,7.61 7,4.5 12,4.5M3.18,12C4.83,15.36 8.24,17.5 12,17.5C15.76,17.5 19.17,15.36 20.82,12C19.17,8.64 15.76,6.5 12,6.5C8.24,6.5 4.83,8.64 3.18,12Z"/>`}
-                  </svg>
-                </button>
               </div>`)}
           </div>` : ""}
       </div>
