@@ -438,6 +438,11 @@ class AcCardEditor extends LitElement {
               <ha-entity-picker .hass=${this.hass} .value=${cfg.humidity_entity || ""} .includeDomains=${["sensor"]}
                 allow-custom-entity @value-changed=${e => this._set("humidity_entity", e.detail.value)}></ha-entity-picker>
             </div>
+            <div class="row">
+              <label class="row-label">Sensore consumo (W)</label>
+              <ha-entity-picker .hass=${this.hass} .value=${cfg.power_entity || ""} .includeDomains=${["sensor"]}
+                allow-custom-entity @value-changed=${e => this._set("power_entity", e.detail.value)}></ha-entity-picker>
+            </div>
           </div>
         </div>
 
