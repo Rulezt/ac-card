@@ -29,7 +29,7 @@ const MDI = {
   fan: "M12,11A1,1 0 0,0 11,12A1,1 0 0,0 12,13A1,1 0 0,0 13,12A1,1 0 0,0 12,11M12.5,2C17,2 17.11,5.57 14.75,6.75C13.68,7.29 13.9,8.42 14.58,8.99C15.86,10.08 17.35,9 17.35,9C19.64,7.57 22.22,9.63 21.19,12C20.69,13.17 19.32,13.19 18.53,12.63C17.55,11.95 16.56,12.71 16.45,13.6C16.2,15.5 17.5,16 17.5,16C20.21,16.94 19.63,20.5 17,20.5C15.8,20.5 15.31,19.55 15.44,18.63C15.59,17.55 14.74,16.82 13.85,16.94C11.96,17.2 12,18.5 12,18.5C12,21.21 8.44,21.76 7.5,19.13C7.06,17.93 7.93,17 8.85,16.94C9.93,16.87 10.55,16 10.39,15.09C10.1,13.2 8.5,13.5 8.5,13.5C5.71,14.26 4.08,11.15 6,9.41C6.93,8.57 8.08,9 8.77,9.79C9.52,10.66 10.66,10.34 11.05,9.46C11.82,7.65 10.5,7 10.5,7C7.89,5.87 8.43,2.28 11.06,2.04L12.5,2Z",
   "arrow-up-down": "M13,6.99H16L12,3L8,6.99H11V17.01H8L12,21L16,17.01H13V6.99Z",
   "chevron-down": "M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z",
-  snowflake: "M20,11H23V13H20V11M1,11H4V13H1V11M13,1V4H11V1H13M4.92,3.5L7.05,5.64L5.63,7.05L3.5,4.93L4.92,3.5M16.95,5.63L19.07,3.5L20.5,4.93L18.37,7.05L16.95,5.63M12,6A6,6 0 0,1 18,12A6,6 0 0,1 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6M12,8A4,4 0 0,0 8,12A4,4 0 0,0 12,16A4,4 0 0,0 16,12A4,4 0 0,0 12,8M3.5,19.07L5.63,16.95L7.05,18.37L4.93,20.5L3.5,19.07M18.37,18.37L19.07,19.07L20.5,19.07L18.37,16.95L16.95,18.37M11,20H13V23H11V20Z",
+  drag: "M9,3H11V5H9V3M13,3H15V5H13V3M9,7H11V9H9V7M13,7H15V9H13V7M9,11H11V13H9V11M13,11H15V13H13V11M9,15H11V17H9V15M13,15H15V17H13V15M9,19H11V21H9V19M13,19H15V21H13V19Z",
 };
 
 const FAN_LABELS = {
@@ -109,6 +109,7 @@ class AcCard extends LitElement {
       show_swing: true,
       show_temperature: true,
       show_humidity: true,
+      modes_order: [],
       hidden_modes: [],
     };
   }
@@ -167,30 +168,28 @@ class AcCard extends LitElement {
     const cardName = cfg.name || "Climatizzatore";
     const hiddenModes = cfg.hidden_modes || [];
 
-    // Fan
-    const showFan = cfg.show_fan !== false;
     const fanModes = fanEntity ? fanEntity.attributes.options : (climate.attributes.fan_modes || []);
     const fanMode = fanEntity ? fanEntity.state : climate.attributes.fan_mode;
-
-    // Swing
-    const showSwing = cfg.show_swing !== false;
     const swingModes = swingEntity ? swingEntity.attributes.options : (climate.attributes.swing_modes || []);
     const swingMode = swingEntity ? swingEntity.state : climate.attributes.swing_mode;
 
-    // Modes
     const availableModes = climate.attributes.hvac_modes || ["off"];
-    const visibleModes = availableModes.filter(m => !hiddenModes.includes(m));
+    const modesOrder = cfg.modes_order || [];
+    const orderedModes = modesOrder.length > 0
+      ? [...modesOrder.filter(m => availableModes.includes(m)), ...availableModes.filter(m => !modesOrder.includes(m))]
+      : availableModes;
+    const visibleModes = orderedModes.filter(m => !hiddenModes.includes(m));
 
     const activeColor = MODE_COLORS[hvacMode] || "#60a5fa";
-
-    // Popup
     const isFanPopup = this._popupType === "fan";
     const popupOptions = isFanPopup ? fanModes : swingModes;
     const popupLabels = isFanPopup ? FAN_LABELS : SWING_LABELS;
     const popupCurrent = isFanPopup ? fanMode : swingMode;
     const popupTitle = isFanPopup ? "Velocità fan" : "Aletta verticale";
 
-    const selectCount = (showFan && fanModes.length > 0 ? 1 : 0) + (showSwing && swingModes.length > 0 ? 1 : 0);
+    const showFan = cfg.show_fan !== false && fanModes.length > 0;
+    const showSwing = cfg.show_swing !== false && swingModes.length > 0;
+    const selectCount = (showFan ? 1 : 0) + (showSwing ? 1 : 0);
 
     return html`
       <div class="card">
@@ -201,15 +200,9 @@ class AcCard extends LitElement {
           </div>
           <div class="header-right">
             ${tempSensor && cfg.show_temperature !== false ? html`
-              <span class="sensor-item">
-                ${svg(MDI.thermometer, "#f87171", 16)}
-                ${parseFloat(tempSensor.state).toFixed(1)}°C
-              </span>` : ""}
+              <span class="sensor-item">${svg(MDI.thermometer, "#f87171", 16)} ${parseFloat(tempSensor.state).toFixed(1)}°C</span>` : ""}
             ${humSensor && cfg.show_humidity !== false ? html`
-              <span class="sensor-item">
-                ${svg(MDI["water-percent"], "#60a5fa", 16)}
-                ${parseFloat(humSensor.state).toFixed(0)}%
-              </span>` : ""}
+              <span class="sensor-item">${svg(MDI["water-percent"], "#60a5fa", 16)} ${parseFloat(humSensor.state).toFixed(0)}%</span>` : ""}
           </div>
         </div>
 
@@ -227,21 +220,17 @@ class AcCard extends LitElement {
             const active = hvacMode === m;
             const color = MODE_COLORS[m] || "#6b7280";
             return html`
-              <button
-                class="mode-btn"
-                title="${MODE_LABELS[m] || m}"
+              <button class="mode-btn" title="${MODE_LABELS[m] || m}"
                 style="${active ? `background:${color}22;border-color:${color};` : "border-color:#3f3f3f;"}"
-                @click=${() => this._setMode(m)}
-              >
+                @click=${() => this._setMode(m)}>
                 ${svg(MODE_ICONS[m] || MODE_ICONS.off, active ? color : "#6b7280", 22)}
-              </button>
-            `;
+              </button>`;
           })}
         </div>
 
         ${selectCount > 0 ? html`
           <div class="selects" style="grid-template-columns:${selectCount === 2 ? "1fr 1fr" : "1fr"}">
-            ${showFan && fanModes.length > 0 ? html`
+            ${showFan ? html`
               <div class="select-box" @click=${() => this._openPopup("fan")}>
                 ${svg(MDI.fan, "#a78bfa", 20)}
                 <div class="select-info">
@@ -250,7 +239,7 @@ class AcCard extends LitElement {
                 </div>
                 ${svg(MDI["chevron-down"], "#6b7280", 16)}
               </div>` : ""}
-            ${showSwing && swingModes.length > 0 ? html`
+            ${showSwing ? html`
               <div class="select-box" @click=${() => this._openPopup("swing")}>
                 ${svg(MDI["arrow-up-down"], "#34d399", 20)}
                 <div class="select-info">
@@ -270,8 +259,7 @@ class AcCard extends LitElement {
             <button class="popup-item ${o === popupCurrent ? "active" : ""}"
               @click=${() => isFanPopup ? this._setFan(o) : this._setSwing(o)}>
               ${popupLabels[o] || o}
-            </button>
-          `)}
+            </button>`)}
           <button class="popup-close" @click=${() => this._popupOpen = false}>Annulla</button>
         </div>
       </div>
@@ -285,6 +273,7 @@ class AcCardEditor extends LitElement {
     return {
       hass: { attribute: false },
       _config: { state: true },
+      _dragIndex: { state: true },
     };
   }
 
@@ -304,17 +293,40 @@ class AcCardEditor extends LitElement {
 
   _toggleMode(mode) {
     const hidden = this._config.hidden_modes || [];
-    const newHidden = hidden.includes(mode) ? hidden.filter(m => m !== mode) : [...hidden, mode];
-    this._set("hidden_modes", newHidden);
+    this._set("hidden_modes", hidden.includes(mode) ? hidden.filter(m => m !== mode) : [...hidden, mode]);
   }
+
+  _onDragStart(e, index) {
+    this._dragIndex = index;
+    e.dataTransfer.effectAllowed = "move";
+  }
+
+  _onDragOver(e, index) {
+    e.preventDefault();
+    if (this._dragIndex === index) return;
+    const climate = this.hass?.states[this._config?.climate_entity];
+    const availableModes = climate?.attributes?.hvac_modes || [];
+    const modesOrder = this._config.modes_order?.length > 0
+      ? [...this._config.modes_order]
+      : [...availableModes];
+    const dragged = modesOrder[this._dragIndex];
+    modesOrder.splice(this._dragIndex, 1);
+    modesOrder.splice(index, 0, dragged);
+    this._dragIndex = index;
+    this._set("modes_order", modesOrder);
+  }
+
+  _onDragEnd() { this._dragIndex = null; }
 
   render() {
     if (!this.hass) return html``;
     const cfg = this._config || {};
     const hidden = cfg.hidden_modes || [];
-
     const climate = cfg.climate_entity ? this.hass.states[cfg.climate_entity] : null;
     const availableModes = climate?.attributes?.hvac_modes || [];
+    const modesOrder = cfg.modes_order?.length > 0
+      ? [...cfg.modes_order.filter(m => availableModes.includes(m)), ...availableModes.filter(m => !cfg.modes_order.includes(m))]
+      : availableModes;
 
     return html`
       <style>
@@ -325,11 +337,16 @@ class AcCardEditor extends LitElement {
         .temp-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
         .temp-row label { display: block; font-size: 12px; color: var(--secondary-text-color); margin-bottom: 4px; }
         h4 { margin: 16px 0 8px; font-size: 12px; color: var(--secondary-text-color); text-transform: uppercase; letter-spacing: 0.5px; }
-        .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--divider-color); font-size: 14px; }
+        .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--divider-color); font-size: 14px; }
         .toggle-row:last-child { border-bottom: none; }
-        .modes-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
-        .mode-chip { display: flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 8px; background: var(--secondary-background-color); border: 1px solid var(--divider-color); font-size: 13px; cursor: pointer; user-select: none; }
-        .mode-chip.hidden { opacity: 0.4; text-decoration: line-through; }
+        .modes-list { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
+        .mode-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px; background: var(--secondary-background-color); border: 1px solid var(--divider-color); font-size: 13px; cursor: grab; user-select: none; }
+        .mode-item.dragging { opacity: 0.4; }
+        .mode-item.hidden-mode { opacity: 0.4; }
+        .drag-handle { color: var(--secondary-text-color); cursor: grab; display: flex; }
+        .mode-name { flex: 1; }
+        .eye-btn { background: none; border: none; cursor: pointer; padding: 2px; display: flex; align-items: center; color: var(--secondary-text-color); }
+        .eye-btn:hover { color: var(--primary-text-color); }
       </style>
       <div class="editor">
         <div class="row">
@@ -339,68 +356,39 @@ class AcCardEditor extends LitElement {
 
         <div class="row">
           <label class="row-label">Entità climate *</label>
-          <ha-entity-picker
-            .hass=${this.hass}
-            .value=${cfg.climate_entity || ""}
-            .includeDomains=${["climate"]}
-            allow-custom-entity
-            @value-changed=${e => this._set("climate_entity", e.detail.value)}
-          ></ha-entity-picker>
+          <ha-entity-picker .hass=${this.hass} .value=${cfg.climate_entity || ""} .includeDomains=${["climate"]}
+            allow-custom-entity @value-changed=${e => this._set("climate_entity", e.detail.value)}></ha-entity-picker>
         </div>
 
         <h4>Sensori (opzionali)</h4>
         <div class="row">
           <label class="row-label">Sensore temperatura</label>
-          <ha-entity-picker
-            .hass=${this.hass}
-            .value=${cfg.temperature_entity || ""}
-            .includeDomains=${["sensor"]}
-            allow-custom-entity
-            @value-changed=${e => this._set("temperature_entity", e.detail.value)}
-          ></ha-entity-picker>
+          <ha-entity-picker .hass=${this.hass} .value=${cfg.temperature_entity || ""} .includeDomains=${["sensor"]}
+            allow-custom-entity @value-changed=${e => this._set("temperature_entity", e.detail.value)}></ha-entity-picker>
         </div>
         <div class="row">
           <label class="row-label">Sensore umidità</label>
-          <ha-entity-picker
-            .hass=${this.hass}
-            .value=${cfg.humidity_entity || ""}
-            .includeDomains=${["sensor"]}
-            allow-custom-entity
-            @value-changed=${e => this._set("humidity_entity", e.detail.value)}
-          ></ha-entity-picker>
+          <ha-entity-picker .hass=${this.hass} .value=${cfg.humidity_entity || ""} .includeDomains=${["sensor"]}
+            allow-custom-entity @value-changed=${e => this._set("humidity_entity", e.detail.value)}></ha-entity-picker>
         </div>
 
         <h4>Entità select (opzionali)</h4>
         <div class="row">
           <label class="row-label">Velocità fan (select esterno)</label>
-          <ha-entity-picker
-            .hass=${this.hass}
-            .value=${cfg.fan_entity || ""}
-            .includeDomains=${["select"]}
-            allow-custom-entity
-            @value-changed=${e => this._set("fan_entity", e.detail.value)}
-          ></ha-entity-picker>
+          <ha-entity-picker .hass=${this.hass} .value=${cfg.fan_entity || ""} .includeDomains=${["select"]}
+            allow-custom-entity @value-changed=${e => this._set("fan_entity", e.detail.value)}></ha-entity-picker>
         </div>
         <div class="row">
           <label class="row-label">Swing verticale (select esterno)</label>
-          <ha-entity-picker
-            .hass=${this.hass}
-            .value=${cfg.swing_entity || ""}
-            .includeDomains=${["select"]}
-            allow-custom-entity
-            @value-changed=${e => this._set("swing_entity", e.detail.value)}
-          ></ha-entity-picker>
+          <ha-entity-picker .hass=${this.hass} .value=${cfg.swing_entity || ""} .includeDomains=${["select"]}
+            allow-custom-entity @value-changed=${e => this._set("swing_entity", e.detail.value)}></ha-entity-picker>
         </div>
 
         <div class="temp-row">
-          <div>
-            <label>Temperatura minima</label>
-            <input type="number" .value=${cfg.min_temp || 16} @change=${e => this._set("min_temp", parseInt(e.target.value))}>
-          </div>
-          <div>
-            <label>Temperatura massima</label>
-            <input type="number" .value=${cfg.max_temp || 30} @change=${e => this._set("max_temp", parseInt(e.target.value))}>
-          </div>
+          <div><label>Temperatura minima</label>
+            <input type="number" .value=${cfg.min_temp || 16} @change=${e => this._set("min_temp", parseInt(e.target.value))}></div>
+          <div><label>Temperatura massima</label>
+            <input type="number" .value=${cfg.max_temp || 30} @change=${e => this._set("max_temp", parseInt(e.target.value))}></div>
         </div>
 
         <h4>Visibilità controlli</h4>
@@ -421,14 +409,27 @@ class AcCardEditor extends LitElement {
           <ha-switch .checked=${cfg.show_humidity !== false} @change=${e => this._set("show_humidity", e.target.checked)}></ha-switch>
         </div>
 
-        ${availableModes.length > 0 ? html`
-          <h4>Modalità da mostrare</h4>
-          <div class="modes-grid">
-            ${availableModes.map(m => html`
-              <div class="mode-chip ${hidden.includes(m) ? "hidden" : ""}" @click=${() => this._toggleMode(m)}>
-                ${MODE_LABELS[m] || m}
-              </div>
-            `)}
+        ${modesOrder.length > 0 ? html`
+          <h4>Ordine e visibilità modalità (trascina per riordinare)</h4>
+          <div class="modes-list">
+            ${modesOrder.map((m, i) => html`
+              <div class="mode-item ${this._dragIndex === i ? "dragging" : ""} ${hidden.includes(m) ? "hidden-mode" : ""}"
+                draggable="true"
+                @dragstart=${e => this._onDragStart(e, i)}
+                @dragover=${e => this._onDragOver(e, i)}
+                @dragend=${this._onDragEnd}>
+                <span class="drag-handle">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="${MDI.drag}"/></svg>
+                </span>
+                <span class="mode-name">${MODE_LABELS[m] || m}</span>
+                <button class="eye-btn" @click=${() => this._toggleMode(m)} title="${hidden.includes(m) ? "Mostra" : "Nascondi"}">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                    ${hidden.includes(m)
+                      ? html`<path d="M11.83,9L15,12.16C15,12.11 15,12.05 15,12A3,3 0 0,0 12,9C11.94,9 11.89,9 11.83,9M7.53,9.8L9.08,11.35C9.03,11.56 9,11.77 9,12A3,3 0 0,0 12,15C12.22,15 12.44,14.97 12.65,14.92L14.2,16.47C13.53,16.8 12.79,17 12,17A5,5 0 0,1 7,12C7,11.21 7.2,10.47 7.53,9.8M2,4.27L4.28,6.55L4.73,7C3.08,8.3 1.78,10 1,12C2.73,16.39 7,19.5 12,19.5C13.55,19.5 15.03,19.2 16.38,18.66L16.81,19.08L19.73,22L21,20.73L3.27,3M12,7A5,5 0 0,1 17,12C17,12.64 16.87,13.26 16.64,13.82L19.57,16.75C21.07,15.5 22.27,13.86 23,12C21.27,7.61 17,4.5 12,4.5C10.6,4.5 9.26,4.75 8,5.2L10.17,7.35C10.74,7.13 11.35,7 12,7Z"/>`
+                      : html`<path d="M12,9A3,3 0 0,1 15,12A3,3 0 0,1 12,15A3,3 0 0,1 9,12A3,3 0 0,1 12,9M12,4.5C17,4.5 21.27,7.61 23,12C21.27,16.39 17,19.5 12,19.5C7,19.5 2.73,16.39 1,12C2.73,7.61 7,4.5 12,4.5M3.18,12C4.83,15.36 8.24,17.5 12,17.5C15.76,17.5 19.17,15.36 20.82,12C19.17,8.64 15.76,6.5 12,6.5C8.24,6.5 4.83,8.64 3.18,12Z"/>`}
+                  </svg>
+                </button>
+              </div>`)}
           </div>` : ""}
       </div>
     `;
