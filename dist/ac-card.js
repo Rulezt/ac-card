@@ -213,18 +213,21 @@ class AcCard extends LitElement {
             ${cardName}
           </div>
           <div class="header-right">
-            ${tempSensor && cfg.show_temperature !== false ? html`
-              <span class="sensor-item">${svg(MDI.thermometer, "#f87171", 16)} ${parseFloat(tempSensor.state).toFixed(1)}°C</span>` : ""}
-            ${humSensor && cfg.show_humidity !== false ? html`
-              <span class="sensor-item">${svg(MDI["water-percent"], "#60a5fa", 16)} ${parseFloat(humSensor.state).toFixed(0)}%</span>` : ""}
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+              <div style="display:flex;gap:12px;">
+                ${tempSensor && cfg.show_temperature !== false ? html`
+                  <span class="sensor-item">${svg(MDI.thermometer, "#f87171", 16)} ${parseFloat(tempSensor.state).toFixed(1)}°C</span>` : ""}
+                ${humSensor && cfg.show_humidity !== false ? html`
+                  <span class="sensor-item">${svg(MDI["water-percent"], "#60a5fa", 16)} ${parseFloat(humSensor.state).toFixed(0)}%</span>` : ""}
+              </div>
+              ${powerSensor ? html`
+                <span class="sensor-item">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="#fbbf24"><path d="M11.5,1L2,6V12C2,17.55 6.08,22.74 12,24C17.92,22.74 22,17.55 22,12V6L11.5,1M11.5,3.18L20,7.3V12C20,16.54 16.6,20.89 11.5,22.03C6.4,20.89 4,16.54 4,12V7.3L11.5,3.18M13,16H11V18H13V16M13,6H11V14H13V6"/></svg>
+                  ${parseFloat(powerSensor.state).toFixed(0)} W
+                </span>` : ""}
+            </div>
           </div>
         </div>
-
-        ${powerSensor ? html`
-        <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;margin-top:-8px;font-size:12px;color:#9ca3af;">
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="#fbbf24"><path d="M11.5,1L2,6V12C2,17.55 6.08,22.74 12,24C17.92,22.74 22,17.55 22,12V6L11.5,1M11.5,3.18L20,7.3V12C20,16.54 16.6,20.89 11.5,22.03C6.4,20.89 4,16.54 4,12V7.3L11.5,3.18M13,16H11V18H13V16M13,6H11V14H13V6"/></svg>
-          <span style="color:white;font-weight:500;">${parseFloat(powerSensor.state).toFixed(0)} W</span>
-        </div>` : ""}
         <div class="temp-section">
           <div class="mode-label">${MODE_LABELS[hvacMode] || hvacMode}</div>
           <div class="temp-controls">
